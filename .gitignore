@@ -1,0 +1,6 @@
+logs/*
+ESIPayPalMSEnv/*
+.vscode/*
+*.pyc
+fixtures
+local_settings.py
