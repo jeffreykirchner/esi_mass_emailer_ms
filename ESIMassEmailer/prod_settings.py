@@ -86,8 +86,4 @@ EMAIL_HOST_USER_NAME = 'ESI Recruiter, Chapman University'
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = os.environ['EMAIL_HOST_USER']
-
-#paypal
-PAYPAL_CLIENT_ID = os.environ['PAYPAL_CLIENT_ID']
-PAYPAL_SECRET = os.environ['PAYPAL_SECRET']
-PAYPAL_URL = os.environ['PAYPAL_URL']
+EMAIL_TEST_ACCOUNT = os.environ['EMAIL_TEST_ACCOUNT']          #all outgoing email sent here when in debug mode

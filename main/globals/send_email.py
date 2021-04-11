@@ -13,54 +13,61 @@ from django.core.mail import send_mail
 
 from main.models import Parameters
 
-def sendMassInvitations(subjectList, subject,message):
+def send_mass_email_to_template(user_list, subject, message, use_test_subject):
+    '''
+    send mass email to user list filling in variables
+        user_list : {email:email, variables:[{name:text},{name:text}] }
+        subject : string subject line of email
+        message : string message template to be sent
+    '''
     logger = logging.getLogger(__name__)
     logger.info("Send mass email to list")
 
-    p = Parameters.objects.first()
+    parameters = Parameters.objects.first()
 
     message_list = []
     message_list.append(())
-    from_email = getFromEmail()   
+    from_email = get_from_email()   
+    test_subject_email = settings.EMAIL_TEST_ACCOUNT       #email address sent to during debug
 
-    block_count = 0
-    c = 0
-    for s in subjectList:
+    logger.info(f'{settings.DEBUG} {test_subject_email}')
 
-        if c == 100:
-            c = 0
+    block_count = 0   #number of message blocks
+    cnt = 0           #message counter within block 
+
+    for user in user_list:
+
+        if cnt == 100:
+            cnt = 0
             block_count += 1
             message_list.append(())
 
-        new_message = message.replace("[subject name]",s.name)
-        new_message = new_message.replace("[log in link]",p.siteURL + "subjectHome/" +str(s.login_key))
+        #fill in variables
+        new_message = message
+
+        for variable in user["variables"]:
+            new_message = new_message.replace(f'[{variable["name"]}]', variable["text"])
 
         #fill in subject parameters
-
-        if settings.DEBUG:
-            message_list[block_count] += ((subject, new_message,from_email,[getTestSubjectEmail()]),)   #use for test emails
+        if use_test_subject:
+            message_list[block_count] += ((subject, new_message, from_email, [test_subject_email]),)   #use for test emails
         else:
-            message_list[block_count] += ((subject, new_message,from_email,[s.contact_email]),)  
+            message_list[block_count] += ((subject, new_message, from_email, [user["email"]]),)  
 
-        c+=1
+        cnt += 1
     
-    return sendMassEmail(block_count,message_list)
-
-#return the test account email to be used
-def getTestSubjectEmail():
-    p = Parameters.objects.get(id=1)
-    s = p.testEmailAccount
-
-    return s
+    return send_mass_email(block_count, message_list)
 
 #return the from address
-def getFromEmail():    
+def get_from_email():    
     return f'"{settings.EMAIL_HOST_USER_NAME}" <{settings.EMAIL_HOST_USER }>'
 
 #send mass email to list,takes a list
-def sendMassEmail(block_count,message_list):
+def send_mass_email(block_count, message_list):
     logger = logging.getLogger(__name__)
     logger.info("Send mass email to list")
+
+    logger.info(message_list)
 
     errorMessage = ""
     mailCount=0
