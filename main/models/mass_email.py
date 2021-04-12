@@ -19,6 +19,7 @@ class MassEmail(models.Model):
     message_text = models.CharField(max_length = 10000, default="Message Text", verbose_name="Message Text")           #message text
     user_list = models.JSONField(verbose_name="User List")                                                             #list of users and template variables
     email_result = models.JSONField(verbose_name="Email Result", default = default_email_result)                       #number of emials successfully sent
+    memo = models.CharField(max_length = 300, default="", verbose_name="Memo")                                         #note about message's purpose
 
     timestamp = models.DateTimeField(auto_now_add= True)
     updated= models.DateTimeField(auto_now= True)

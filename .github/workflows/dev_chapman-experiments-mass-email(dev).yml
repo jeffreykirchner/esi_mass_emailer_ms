@@ -56,8 +56,6 @@ jobs:
         EMAIL_TEST_ACCOUNT: abc
         SECRET_KEY: super_duper_secret_key
       run: python manage.py test
-      
-    # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
     
     - name: Upload artifact for deployment jobs
       uses: actions/upload-artifact@v2

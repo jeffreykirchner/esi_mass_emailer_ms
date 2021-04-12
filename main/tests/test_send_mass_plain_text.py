@@ -46,13 +46,13 @@ class TestAutoPay(TestCase):
         logger = logging.getLogger(__name__)
 
         user_list=[]
-        user_list.append({'email' : 'abc@123.edu','variables':[{'name':'name','text':'sam'},{'name':'date','text':'1/11/11 3:30pm Pacific'}]})
+        user_list.append({'email' : 'abc@123.edu',
+                          'variables':[{'name':'name','text':'sam'}, {'name':'date','text':'1/11/11 3:30pm Pacific'}]})
 
-        result = send_mass_email_from_template(self.user, user_list, self.message_subject, self.message_template_2, True)
+        memo = 'just testing'
+
+        result = send_mass_email_from_template(self.user, user_list, self.message_subject, self.message_template_2,memo, True)
 
         self.assertEqual(len(mail.outbox), 1)
-
-        #force fail
-        self.assertEqual(1,0)
         
         
