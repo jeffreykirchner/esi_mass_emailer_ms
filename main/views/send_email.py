@@ -14,7 +14,7 @@ from main.globals import send_mass_email_from_template
 
 class SendEmailView(APIView):
     '''
-    return a list of all payments or take a list for payment
+    take a mass email for sending
     '''
     permission_classes = [permissions.IsAuthenticated]
 
@@ -34,6 +34,11 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     take incoming email and send it
     '''
 
-    result = send_mass_email_from_template(user, data["user_list"], data["message_subject"], data["message_text"], use_test_subject)
+    result = send_mass_email_from_template(user,
+                                           data["user_list"],
+                                           data["message_subject"],
+                                           data["message_text"],
+                                           data["memo"],
+                                           use_test_subject)
 
     return result

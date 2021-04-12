@@ -14,12 +14,14 @@ from django.core.mail import send_mail
 
 from main.models import Parameters, MassEmail
 
-def send_mass_email_from_template(user, user_list, subject, message, use_test_subject):
+def send_mass_email_from_template(user, user_list, subject, message, memo, use_test_account):
     '''
     send mass email to user list filling in variables
         user_list : {email:email, variables:[{name:text},{name:text}] }
         subject : string subject line of email
         message : string message template to be sent
+        memo : string about message's purpose
+        use_test_accout : send all email to test accout
     '''
     logger = logging.getLogger(__name__)
     logger.info("Send mass email to list")
@@ -29,41 +31,48 @@ def send_mass_email_from_template(user, user_list, subject, message, use_test_su
     message_list = []
     message_list.append(())
     from_email = get_from_email()   
-    test_subject_email = settings.EMAIL_TEST_ACCOUNT       #email address sent to during debug
+    test_account_email = settings.EMAIL_TEST_ACCOUNT       #email address sent to during debug
 
     mass_email = MassEmail()
     mass_email.app = user
     mass_email.message_subject = subject
     mass_email.message_text = message
     mass_email.user_list = user_list
+    mass_email.memo = memo
 
     mass_email.save()
 
-    logger.info(f'{settings.DEBUG} {test_subject_email}')
+    logger.info(f'{settings.DEBUG} {test_account_email}')
 
     block_count = 0   #number of message blocks
     cnt = 0           #message counter within block 
 
-    for user in user_list:
+    try:
+        for user in user_list:
 
-        if cnt == 100:
-            cnt = 0
-            block_count += 1
-            message_list.append(())
+            if cnt == 100:
+                cnt = 0
+                block_count += 1
+                message_list.append(())
 
-        #fill in variables
-        new_message = message
+            #fill in variables
+            new_message = message
 
-        for variable in user["variables"]:
-            new_message = new_message.replace(f'[{variable["name"]}]', variable["text"])
+            for variable in user["variables"]:
+                new_message = new_message.replace(f'[{variable["name"]}]', variable["text"])
 
-        #fill in subject parameters
-        if use_test_subject:
-            message_list[block_count] += ((subject, new_message, from_email, [test_subject_email]),)   #use for test emails
-        else:
-            message_list[block_count] += ((subject, new_message, from_email, [user["email"]]),)  
+            #fill in subject parameters
+            if use_test_account:
+                message_list[block_count] += ((subject, new_message, from_email, [test_account_email]),)   #use for test emails
+            else:
+                message_list[block_count] += ((subject, new_message, from_email, [user["email"]]),)  
 
-        cnt += 1
+            cnt += 1
+
+    except KeyError as key_error:
+        logger.warning(f"send_mass_email_from_template: {key_error} was not found in {user}")
+        return {'text' : {"mail_count" : 0, "error_message" : f'{key_error} was not found in {user}'},
+                'code' : status.HTTP_400_BAD_REQUEST}
     
     mass_email.email_result = send_mass_email(block_count, message_list)
     mass_email.save()
