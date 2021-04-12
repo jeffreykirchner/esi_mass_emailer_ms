@@ -45,7 +45,7 @@ jobs:
     - name: Run tests
       env:
         ALLOWED_HOSTS: localhost 127.0.0.1
-        DBHOST: 127.0.0.1
+        DBHOST: localhost
         DBNAME: github_actions
         DBPASS: postgres
         DBUSER: postgres
