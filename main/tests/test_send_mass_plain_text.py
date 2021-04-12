@@ -51,5 +51,8 @@ class TestAutoPay(TestCase):
         result = send_mass_email_from_template(self.user, user_list, self.message_subject, self.message_template_2, True)
 
         self.assertEqual(len(mail.outbox), 1)
+
+        #force fail
+        self.assertEqual(1,0)
         
         
