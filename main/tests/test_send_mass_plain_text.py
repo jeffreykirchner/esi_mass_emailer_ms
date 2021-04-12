@@ -41,7 +41,7 @@ class TestAutoPay(TestCase):
 
     def test_mass_email_plain_text(self):
         '''
-        test auto pay feature
+        test mass email
         '''
         logger = logging.getLogger(__name__)
 
@@ -54,5 +54,38 @@ class TestAutoPay(TestCase):
         result = send_mass_email_from_template(self.user, user_list, self.message_subject, self.message_template_2,memo, True)
 
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(result["code"], 201)
+
+        #test send 12 emails
+        mail.outbox=[]
+        user_list2=[]
+        
+        for user in range(12):
+            user_list2.append({'email' : 'abc@123.edu',
+                               'variables':[{'name':'name','text':'sam'}, {'name':'date','text':'1/11/11 3:30pm Pacific'}]})
+
+        result = send_mass_email_from_template(self.user, user_list2, self.message_subject, self.message_template_2,memo, True)
+
+        self.assertEqual(len(mail.outbox), 12)
+        self.assertEqual(result["code"], 201)
+
+        #test malformed email
+        mail.outbox=[]
+        user_list3=[]
+
+        user_list3.append({'email' : 'abc@123.edu',
+                           'variable':[{'name':'name','text':'sam'}, {'name':'date','text':'1/11/11 3:30pm Pacific'}]})
+        
+        result = send_mass_email_from_template(self.user, user_list3, self.message_subject, self.message_template_2,memo, True)
+
+        self.assertEqual(result["code"], 400)
+        self.assertEqual(len(mail.outbox), 0)
+
+
+
+
+
+
+
         
         
