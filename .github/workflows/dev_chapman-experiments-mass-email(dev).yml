@@ -31,7 +31,20 @@ jobs:
       run: pip install -r requirements.txt
 
     - name: Run tests
-      run: python manage.py test  
+      env:
+        ALLOWED_HOSTS: localhost 127.0.0.1
+        DBHOST: localhost
+        DBNAME: github_actions
+        DBPASS: postgres
+        DBUSER: postgres
+        LOG_LOCATION: abc
+        EMAIL_MS_HOST: abc
+        EMAIL_HOST_USER: abc
+        EMAIL_HOST_PASSWORD: abc
+        EMAIL_TEST_ACCOUNT: abc
+        SECRET_KEY: super_duper_secret_key
+      run: python manage.py test
+      
     # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
     
     - name: Upload artifact for deployment jobs
