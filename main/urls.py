@@ -12,6 +12,8 @@ urlpatterns = [
 
     path('', views.root_path),
 
+    path('send-email/', views.SendEmailView.as_view()),
+
     #txt
     path('robots.txt', views.RobotsTxt, name='robotsTxt'),
     path('ads.txt', views.AdsTxt, name='adsTxt'),

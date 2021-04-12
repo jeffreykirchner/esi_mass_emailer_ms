@@ -1,5 +1,6 @@
 
 from smtplib import SMTPException
+from rest_framework import status
 
 import logging
 import random
@@ -11,9 +12,9 @@ from django.utils.crypto import get_random_string
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
 
-from main.models import Parameters
+from main.models import Parameters, MassEmail
 
-def send_mass_email_to_template(user_list, subject, message, use_test_subject):
+def send_mass_email_from_template(user, user_list, subject, message, use_test_subject):
     '''
     send mass email to user list filling in variables
         user_list : {email:email, variables:[{name:text},{name:text}] }
@@ -29,6 +30,14 @@ def send_mass_email_to_template(user_list, subject, message, use_test_subject):
     message_list.append(())
     from_email = get_from_email()   
     test_subject_email = settings.EMAIL_TEST_ACCOUNT       #email address sent to during debug
+
+    mass_email = MassEmail()
+    mass_email.app = user
+    mass_email.message_subject = subject
+    mass_email.message_text = message
+    mass_email.user_list = user_list
+
+    mass_email.save()
 
     logger.info(f'{settings.DEBUG} {test_subject_email}')
 
@@ -56,7 +65,13 @@ def send_mass_email_to_template(user_list, subject, message, use_test_subject):
 
         cnt += 1
     
-    return send_mass_email(block_count, message_list)
+    mass_email.email_result = send_mass_email(block_count, message_list)
+    mass_email.save()
+
+    if mass_email.email_result["error_message"] == "":
+        return {'text' : mass_email.email_result, 'code' : status.HTTP_201_CREATED}
+    else:
+        return {'text' : mass_email.email_result, 'code' : status.HTTP_400_BAD_REQUEST}
 
 #return the from address
 def get_from_email():    
@@ -69,17 +84,17 @@ def send_mass_email(block_count, message_list):
 
     logger.info(message_list)
 
-    errorMessage = ""
-    mailCount=0
+    error_message = ""
+    mail_count=0
     if len(message_list)>0 :
         try:
             for x in range(block_count+1):            
                 logger.info("Sending Block " + str(x+1) + " of " + str(block_count+1))
-                mailCount += send_mass_mail(message_list[x], fail_silently=False) 
+                mail_count += send_mass_mail(message_list[x], fail_silently=False) 
         except SMTPException as e:
             logger.info('There was an error sending email: ' + str(e)) 
-            errorMessage = str(e)
+            error_message = str(e)
     else:
-        errorMessage="Message list empty, no emails sent."
+        error_message = "Message list empty, no emails sent."
 
-    return {"mailCount":mailCount,"errorMessage":errorMessage}
+    return {"mail_count" : mail_count, "error_message" : error_message}

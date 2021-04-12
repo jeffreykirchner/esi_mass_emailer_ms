@@ -1,5 +1,5 @@
 '''
 build main.globals
 '''
-from .send_email import *
+from .send_email_global import *
 from .todays_date import *
