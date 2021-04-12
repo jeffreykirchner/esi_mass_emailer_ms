@@ -24,6 +24,18 @@ jobs:
         python-version: '3.8'
 
     - name: Build using AppService-Build
+      env:
+        ALLOWED_HOSTS: localhost 127.0.0.1
+        DBHOST: localhost
+        DBNAME: github_actions
+        DBPASS: postgres
+        DBUSER: postgres
+        LOG_LOCATION: abc
+        EMAIL_MS_HOST: abc
+        EMAIL_MS_USER_NAME: abc
+        EMAIL_MS_PASSWORD: abc
+        EMAIL_TEST_ACCOUNT: abc
+        SECRET_KEY: super_duper_secret_key
       uses: azure/appservice-build@v2
       with:
         platform: python
