@@ -2,8 +2,12 @@
 from smtplib import SMTPException
 from rest_framework import status
 
+from asgiref.sync import async_to_sync
+from datetime import datetime
+
 import logging
 import random
+import asyncio
 
 from django.conf import settings
 from django.core.mail import send_mass_mail
@@ -23,16 +27,20 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
         memo : string about message's purpose
         use_test_accout : send all email to test accout
     '''
+
     logger = logging.getLogger(__name__)
     logger.info("Send mass email to list")
 
+    #no emails to send
+    if len(user_list) == 0:
+        return {"mail_count" : 0, "error_message" : "Message list empty, no emails sent."}
+
     parameters = Parameters.objects.first()
 
-    message_list = []
-    message_list.append(())
     from_email = get_from_email()   
     test_account_email = settings.EMAIL_TEST_ACCOUNT       #email address sent to during debug
 
+    #store message
     mass_email = MassEmail()
     mass_email.app = user
     mass_email.message_subject = subject
@@ -44,17 +52,18 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 
     logger.info(f'{settings.DEBUG} {test_account_email}')
 
-    block_count = 0   #number of message blocks
-    cnt = 0           #message counter within block 
+    message_block_count = 20           #number of message blocks to send
+    message_block_counter = 0          #loop counter
+
+    message_block_list = []            #list of all messages
+
+    #fill with empty tuples
+    for i in range(message_block_count):
+        message_block_list.append(())
 
     try:
         for user in user_list:
-
-            if cnt == 100:
-                cnt = 0
-                block_count += 1
-                message_list.append(())
-
+                           
             #fill in variables
             new_message = message
 
@@ -63,18 +72,39 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 
             #fill in subject parameters
             if use_test_account:
-                message_list[block_count] += ((subject, new_message, from_email, [test_account_email]),)   #use for test emails
+                message_block_list[message_block_counter] += ((subject, new_message, from_email, [test_account_email]),)   #use for test emails
             else:
-                message_list[block_count] += ((subject, new_message, from_email, [user["email"]]),)  
+                message_block_list[message_block_counter] += ((subject, new_message, from_email, [user["email"]]),)  
 
-            cnt += 1
+            message_block_counter += 1
+
+            if message_block_counter == 20:
+                message_block_counter = 0
 
     except KeyError as key_error:
         logger.warning(f"send_mass_email_from_template: {key_error} was not found in {user}")
         return {'text' : {"mail_count" : 0, "error_message" : f'{key_error} was not found in {user}'},
                 'code' : status.HTTP_400_BAD_REQUEST}
     
-    mass_email.email_result = send_mass_email(block_count, message_list)
+    #send emails
+    mail_count = 0
+    error_message = ""
+
+    logger.info(f'Start mail send {datetime.now()}')
+
+    try:
+
+        mail_count = send_email_blocks(message_block_list)    
+
+        # for message_block in message_block_list:            
+        #     mail_count += send_email_block(message_block)
+    except SMTPException as e:
+        logger.warning('There was an error sending email: ' + str(e)) 
+        error_message = str(e)
+    
+    logger.info(f'End mail send {datetime.now()}, mail count {mail_count}, error message: {error_message}')
+
+    mass_email.email_result = {"mail_count" : mail_count, "error_message" : error_message}
     mass_email.save()
 
     if mass_email.email_result["error_message"] == "":
@@ -86,24 +116,27 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 def get_from_email():    
     return f'"{settings.EMAIL_HOST_USER_NAME}" <{settings.EMAIL_HOST_USER }>'
 
-#send mass email to list,takes a list
-def send_mass_email(block_count, message_list):
-    logger = logging.getLogger(__name__)
-    logger.info("Send mass email to list")
+@async_to_sync
+async def send_email_blocks(message_block_list):
+    mail_count = 0
 
-    logger.info(message_list)
+    task_list = []
+    for message_block in message_block_list:
+        if len(message_block) > 0:
+            task_list.append(send_email_block(message_block))
 
-    error_message = ""
-    mail_count=0
-    if len(message_list)>0 :
-        try:
-            for x in range(block_count+1):            
-                logger.info("Sending Block " + str(x+1) + " of " + str(block_count+1))
-                mail_count += send_mass_mail(message_list[x], fail_silently=False) 
-        except SMTPException as e:
-            logger.info('There was an error sending email: ' + str(e)) 
-            error_message = str(e)
-    else:
-        error_message = "Message list empty, no emails sent."
+    mail_count = await asyncio.gather(*task_list)
 
-    return {"mail_count" : mail_count, "error_message" : error_message}
+    # for task in task_list:
+    #     mail_count += await task
+    
+    return sum(mail_count)
+
+async def send_email_block(message_block):
+    '''
+    send single email block
+    '''
+    #test code
+    #await asyncio.sleep(3)
+
+    return send_mass_mail(message_block, fail_silently=False) 

@@ -81,6 +81,19 @@ class TestAutoPay(TestCase):
         self.assertEqual(result["code"], 400)
         self.assertEqual(len(mail.outbox), 0)
 
+        #test send 3001 emails
+        mail.outbox=[]
+        user_list4=[]
+        
+        for user in range(3001):
+            user_list4.append({'email' : 'abc@123.edu',
+                               'variables':[{'name':'name','text':'sam'}, {'name':'date','text':'1/11/11 3:30pm Pacific'}]})
+
+        result = send_mass_email_from_template(self.user, user_list4, self.message_subject, self.message_template_2,memo, True)
+
+        self.assertEqual(len(mail.outbox), 3001)
+        self.assertEqual(result["code"], 201)
+
 
 
 
