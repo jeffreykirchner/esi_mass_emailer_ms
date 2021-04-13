@@ -3,6 +3,7 @@ from smtplib import SMTPException
 from rest_framework import status
 
 from asgiref.sync import async_to_sync
+from datetime import datetime
 
 import logging
 import random
@@ -89,6 +90,8 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
     mail_count = 0
     error_message = ""
 
+    logger.info(f'Start mail send {datetime.now()}')
+
     try:
 
         mail_count = send_email_blocks(message_block_list)    
@@ -98,6 +101,8 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
     except SMTPException as e:
         logger.warning('There was an error sending email: ' + str(e)) 
         error_message = str(e)
+    
+    logger.info(f'End mail send {datetime.now()}, mail count {mail_count}, error message: {error_message}')
 
     mass_email.email_result = {"mail_count" : mail_count, "error_message" : error_message}
     mass_email.save()
@@ -117,7 +122,8 @@ async def send_email_blocks(message_block_list):
 
     task_list = []
     for message_block in message_block_list:
-        task_list.append(send_email_block(message_block))
+        if len(message_block) > 0:
+            task_list.append(send_email_block(message_block))
 
     mail_count = await asyncio.gather(*task_list)
 
@@ -130,4 +136,7 @@ async def send_email_block(message_block):
     '''
     send single email block
     '''
+    #test code
+    #await asyncio.sleep(3)
+
     return send_mass_mail(message_block, fail_silently=False) 
