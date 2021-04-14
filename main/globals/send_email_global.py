@@ -72,6 +72,7 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 
             #fill in subject parameters
             if use_test_account:
+                email = user["email"]
                 message_block_list[message_block_counter] += ((subject, new_message, from_email, [test_account_email]),)   #use for test emails
             else:
                 message_block_list[message_block_counter] += ((subject, new_message, from_email, [user["email"]]),)  
