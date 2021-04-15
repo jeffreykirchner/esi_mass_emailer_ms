@@ -4,10 +4,12 @@ from rest_framework import status
 
 from asgiref.sync import async_to_sync
 from datetime import datetime
+from multiprocessing import Pool
 
 import logging
 import random
 import asyncio
+import concurrent.futures
 
 from django.conf import settings
 from django.core.mail import send_mass_mail
@@ -95,7 +97,7 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 
     try:
 
-        mail_count = send_email_blocks(message_block_list)    
+        mail_count = send_email_blocks_pool(message_block_list)    
 
         # for message_block in message_block_list:            
         #     mail_count += send_email_block(message_block)
@@ -119,6 +121,9 @@ def get_from_email():
 
 @async_to_sync
 async def send_email_blocks(message_block_list):
+    '''
+    send email blocks using asyncio
+    '''
     mail_count = 0
 
     task_list = []
@@ -127,13 +132,47 @@ async def send_email_blocks(message_block_list):
             task_list.append(send_email_block(message_block))
 
     mail_count = await asyncio.gather(*task_list)
-
-    # for task in task_list:
-    #     mail_count += await task
     
     return sum(mail_count)
 
-async def send_email_block(message_block):
+def send_email_blocks_pool(message_block_list):
+    '''
+    send email blocks using using multiprocessing pool
+    '''
+
+    logger = logging.getLogger(__name__)
+
+    mail_count = []
+
+    with Pool(20) as p:
+
+        mail_count = p.map(send_email_block, message_block_list)
+    
+    logger.info(f'send_email_blocks_pool {mail_count}')
+
+    return sum(mail_count)
+
+@async_to_sync
+async def send_email_blocks_threads(message_block_list):
+    '''
+    send email blocks in separate threads
+    '''
+
+    mail_count = 0
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
+
+        for message_block in message_block_list:
+            if len(message_block) > 0:
+                futures.append(executor.submit(send_email_block, message_block=message_block))
+
+        for future in concurrent.futures.as_completed(futures):
+            mail_count += await future.result()
+    
+    return mail_count
+
+def send_email_block(message_block):
     '''
     send single email block
     '''

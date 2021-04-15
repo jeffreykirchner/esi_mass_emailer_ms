@@ -53,7 +53,7 @@ class TestAutoPay(TestCase):
 
         result = send_mass_email_from_template(self.user, user_list, self.message_subject, self.message_template_2,memo, True)
 
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(result["text"]["mail_count"], 1)
         self.assertEqual(result["code"], 201)
 
         #test send 12 emails
@@ -66,7 +66,7 @@ class TestAutoPay(TestCase):
 
         result = send_mass_email_from_template(self.user, user_list2, self.message_subject, self.message_template_2,memo, True)
 
-        self.assertEqual(len(mail.outbox), 12)
+        self.assertEqual(result["text"]["mail_count"], 12)
         self.assertEqual(result["code"], 201)
 
         #test malformed email
@@ -79,7 +79,7 @@ class TestAutoPay(TestCase):
         result = send_mass_email_from_template(self.user, user_list3, self.message_subject, self.message_template_2,memo, True)
 
         self.assertEqual(result["code"], 400)
-        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(result["text"]["mail_count"], 0)
 
         #test send 3001 emails
         mail.outbox=[]
@@ -91,7 +91,7 @@ class TestAutoPay(TestCase):
 
         result = send_mass_email_from_template(self.user, user_list4, self.message_subject, self.message_template_2,memo, True)
 
-        self.assertEqual(len(mail.outbox), 3001)
+        self.assertEqual(result["text"]["mail_count"], 3001)
         self.assertEqual(result["code"], 201)
 
 
