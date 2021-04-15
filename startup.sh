@@ -1,2 +1,2 @@
 python manage.py migrate
-daphne -b 0.0.0.0 ESIMassEmailer.asgi:application
+gunicorn --bind=0.0.0.0 --timeout 1200 --max-requests 500 --max-requests-jitter 10  ESIMassEmailer.wsgi
