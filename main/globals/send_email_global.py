@@ -142,15 +142,27 @@ def send_email_blocks_pool(message_block_list):
 
     logger = logging.getLogger(__name__)
 
+    message_block_list_trimmed = []
+
+    for message_block in message_block_list:
+        if len(message_block) > 0:
+            message_block_list_trimmed.append(message_block)
+
     mail_count = []
 
-    with Pool(20) as p:
+    if len(message_block_list_trimmed) == 1:
+        mail_count = send_email_block(message_block_list_trimmed[0])
 
-        mail_count = p.map(send_email_block, message_block_list)
+        logger.info(f'send_email_blocks_pool single mail {mail_count}')
+
+        return mail_count
+    else:
+        with Pool(len(message_block_list_trimmed)) as p:
+            mail_count = p.map(send_email_block, message_block_list_trimmed)
     
-    logger.info(f'send_email_blocks_pool {mail_count}')
+        logger.info(f'send_email_blocks_pool {mail_count}')
 
-    return sum(mail_count)
+        return sum(mail_count)
 
 @async_to_sync
 async def send_email_blocks_threads(message_block_list):
