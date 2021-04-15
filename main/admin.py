@@ -20,7 +20,7 @@ class MassEmailAdmin(admin.ModelAdmin):
     
     list_display = ['message_subject','app','memo']
 
-    readonly_fields = ('app', 'message_subject', 'message_text', 'user_list', 'email_result', 'memo')
+    readonly_fields = ('app', 'message_subject', 'message_text', 'user_list', 'email_result', 'memo','timestamp','updated')
 
 
       
