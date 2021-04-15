@@ -1,10 +1,10 @@
 asgiref==3.3.4
 astroid==2.5.3
-daphne==3.0.*
+#daphne==3.0.*
 Django==3.2.*
 django-filter==2.4.0
 djangorestframework==3.12.*
-#gunicorn==20.1.0
+gunicorn==20.1.*
 isort==5.8.0
 lazy-object-proxy==1.6.0
 Markdown==3.3.4
