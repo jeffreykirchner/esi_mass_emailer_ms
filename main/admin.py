@@ -18,7 +18,7 @@ class MassEmailAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         return False
     
-    list_display = ['message_subject','app','memo']
+    list_display = ['message_subject', 'app', 'memo', 'timestamp']
 
     readonly_fields = ('app', 'message_subject', 'message_text', 'user_list', 'email_result', 'memo','timestamp','updated')
 
