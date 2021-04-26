@@ -35,7 +35,9 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 
     #no emails to send
     if len(user_list) == 0:
-        return {"mail_count" : 0, "error_message" : "Message list empty, no emails sent."}
+        logger.warning("User list empty")
+        return {'text' : {"mail_count" : 0, "error_message" : 'User list empty'},
+                'code' : status.HTTP_400_BAD_REQUEST}
 
     parameters = Parameters.objects.first()
 

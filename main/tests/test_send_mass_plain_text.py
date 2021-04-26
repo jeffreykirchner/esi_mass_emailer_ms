@@ -94,6 +94,12 @@ class TestAutoPay(TestCase):
         self.assertEqual(result["text"]["mail_count"], 3001)
         self.assertEqual(result["code"], 201)
 
+        #test send empty user list
+        result = send_mass_email_from_template(self.user, [], self.message_subject, self.message_template_2,memo, True)
+        self.assertEqual(result["text"]["mail_count"], 0)
+        self.assertEqual(result["code"], 400)
+
+
 
 
 
