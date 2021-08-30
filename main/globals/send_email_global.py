@@ -83,7 +83,7 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 
             message_block_counter += 1
 
-            if message_block_counter == 20:
+            if message_block_counter == 10:
                 message_block_counter = 0
 
     except KeyError as key_error:
