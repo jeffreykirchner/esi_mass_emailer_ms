@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework import permissions
 
 import logging
+import time
 
 from django.conf import settings
 
@@ -55,6 +56,7 @@ def take_and_send_incoming_email(user, data, use_test_subject):
 
             email_counter = 0
             user_list = []
+            time.sleep(3)
 
     result_list.append(send_mass_email_from_template(user,
                                                      user_list,
