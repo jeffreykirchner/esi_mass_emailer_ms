@@ -56,7 +56,7 @@ def take_and_send_incoming_email(user, data, use_test_subject):
 
             email_counter = 0
             user_list = []
-            time.sleep(10)
+            time.sleep(30)
 
     result_list.append(send_mass_email_from_template(user,
                                                      user_list,
