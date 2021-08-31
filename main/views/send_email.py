@@ -39,7 +39,7 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     result_list = []
     email_counter = 0
     user_list = []
-    sleep_length = 45
+    sleep_length = 60
 
     for u in data["user_list"]:
 
