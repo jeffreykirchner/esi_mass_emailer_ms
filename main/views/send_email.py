@@ -35,11 +35,11 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     take incoming email and send it, send emails in groups of block size to limit overloading
     '''
 
-    email_block = 250
+    email_block = 500
     result_list = []
     email_counter = 0
     user_list = []
-    sleep_length = 30
+    sleep_length = 45
 
     for u in data["user_list"]:
 
