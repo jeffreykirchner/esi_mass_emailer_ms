@@ -39,6 +39,7 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     result_list = []
     email_counter = 0
     user_list = []
+    sleep_length = 10
 
     for u in data["user_list"]:
 
@@ -56,14 +57,18 @@ def take_and_send_incoming_email(user, data, use_test_subject):
 
             email_counter = 0
             user_list = []
-            time.sleep(30)
+            time.sleep(sleep_length)
 
-    result_list.append(send_mass_email_from_template(user,
-                                                     user_list,
-                                                     data["message_subject"],
-                                                     data["message_text"],
-                                                     data["memo"],
-                                                     use_test_subject))
+    if len(data["user_list"]) > email_block:
+        time.sleep(sleep_length)
+
+    if len(user_list)>0:
+        result_list.append(send_mass_email_from_template(user,
+                                                        user_list,
+                                                        data["message_subject"],
+                                                        data["message_text"],
+                                                        data["memo"],
+                                                        use_test_subject))
 
     mail_count = 0
     mail_code = status.HTTP_201_CREATED
