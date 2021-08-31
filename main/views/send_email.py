@@ -59,7 +59,7 @@ def take_and_send_incoming_email(user, data, use_test_subject):
             user_list = []
             time.sleep(sleep_length)
 
-    if len(data["user_list"]) > email_block:
+    if len(data["user_list"]) >= email_block:
         time.sleep(sleep_length)
 
     if len(user_list)>0:
