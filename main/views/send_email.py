@@ -31,14 +31,52 @@ class SendEmailView(APIView):
 
 def take_and_send_incoming_email(user, data, use_test_subject):
     '''
-    take incoming email and send it
+    take incoming email and send it, send emails in groups of block size to limit overloading
     '''
 
-    result = send_mass_email_from_template(user,
-                                           data["user_list"],
-                                           data["message_subject"],
-                                           data["message_text"],
-                                           data["memo"],
-                                           use_test_subject)
+    email_block = 250
+    result_list = []
+    email_counter = 0
+    user_list = []
 
-    return result
+    for u in data["user_list"]:
+
+        email_counter += 1
+
+        user_list.append(u)
+
+        if email_counter == email_block:
+            result_list.append(send_mass_email_from_template(user,
+                                                user_list,
+                                                data["message_subject"],
+                                                data["message_text"],
+                                                data["memo"],
+                                                use_test_subject))
+
+            email_counter = 0
+            user_list = []
+
+    result_list.append(send_mass_email_from_template(user,
+                                                     user_list,
+                                                     data["message_subject"],
+                                                     data["message_text"],
+                                                     data["memo"],
+                                                     use_test_subject))
+
+    mail_count = 0
+    mail_code = status.HTTP_201_CREATED
+    error_message = ""
+
+    for r in result_list:
+        mail_count += r["text"]["mail_count"]
+
+        if r["text"]["error_message"] != "":
+            error_message += r["text"]["error_message"] + " "
+        
+        if r["code"] == status.HTTP_400_BAD_REQUEST:
+            mail_code = status.HTTP_400_BAD_REQUEST
+        
+
+
+    return {'text' : {"mail_count" : mail_count, "error_message" : error_message},
+            'code' : mail_code}
