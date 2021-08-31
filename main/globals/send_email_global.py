@@ -56,7 +56,7 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 
     logger.info(f'{settings.DEBUG} {test_account_email}')
 
-    message_block_count = 20           #number of message blocks to send
+    message_block_count = 10           #number of message blocks to send
     message_block_counter = 0          #loop counter
 
     message_block_list = []            #list of all messages
@@ -83,7 +83,7 @@ def send_mass_email_from_template(user, user_list, subject, message, memo, use_t
 
             message_block_counter += 1
 
-            if message_block_counter == 10:
+            if message_block_counter == message_block_count:
                 message_block_counter = 0
 
     except KeyError as key_error:
