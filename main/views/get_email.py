@@ -12,7 +12,10 @@ import logging
 
 from django.conf import settings
 
-from main.globals import send_mass_email_from_template, make_tz_aware_utc
+from main.globals import send_mass_email_from_template
+from main.globals import send_mass_email_message_from_template
+from main.globals import make_tz_aware_utc
+
 from main.serializers import MassEmailSerializer
 from main.models import MassEmail
 
@@ -52,10 +55,11 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     take incoming email and send it
     '''
 
-    result = send_mass_email_from_template(user,
+    result = send_mass_email_message_from_template(user,
                                            data["user_list"],
                                            data["message_subject"],
                                            data["message_text"],
+                                           data.get("message_text_html", None),
                                            data["memo"],
                                            use_test_subject)
 
