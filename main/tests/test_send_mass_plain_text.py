@@ -10,6 +10,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from main.globals import send_mass_email_from_template
+from main.globals import send_mass_email_message_from_template
 
 from django.core import mail
 
@@ -29,6 +30,7 @@ class TestAutoPay(TestCase):
                        '''
 
     message_template_2 = "test"
+    message_template_2_html = "<b>test</b>"
     
     message_subject = '*** TEST MESSAGE ***'
 
@@ -51,7 +53,7 @@ class TestAutoPay(TestCase):
 
         memo = 'just testing'
 
-        result = send_mass_email_from_template(self.user, user_list, self.message_subject, self.message_template_2,memo, True)
+        result = send_mass_email_message_from_template(self.user, user_list, self.message_subject, self.message_template_2, self.message_template_2_html, memo, True)
 
         self.assertEqual(result["text"]["mail_count"], 1)
         self.assertEqual(result["code"], 201)
@@ -64,7 +66,7 @@ class TestAutoPay(TestCase):
             user_list2.append({'email' : 'abc@123.edu',
                                'variables':[{'name':'name','text':'sam'}, {'name':'date','text':'1/11/11 3:30pm Pacific'}]})
 
-        result = send_mass_email_from_template(self.user, user_list2, self.message_subject, self.message_template_2,memo, True)
+        result = send_mass_email_message_from_template(self.user, user_list2, self.message_subject, self.message_template_2, self.message_template_2_html, memo, True)
 
         self.assertEqual(result["text"]["mail_count"], 12)
         self.assertEqual(result["code"], 201)
@@ -76,7 +78,7 @@ class TestAutoPay(TestCase):
         user_list3.append({'email' : 'abc@123.edu',
                            'variable':[{'name':'name','text':'sam'}, {'name':'date','text':'1/11/11 3:30pm Pacific'}]})
         
-        result = send_mass_email_from_template(self.user, user_list3, self.message_subject, self.message_template_2,memo, True)
+        result = send_mass_email_message_from_template(self.user, user_list3, self.message_subject, self.message_template_2, self.message_template_2_html, memo, True)
 
         self.assertEqual(result["code"], 400)
         self.assertEqual(result["text"]["mail_count"], 0)
@@ -89,13 +91,13 @@ class TestAutoPay(TestCase):
             user_list4.append({'email' : 'abc@123.edu',
                                'variables':[{'name':'name','text':'sam'}, {'name':'date','text':'1/11/11 3:30pm Pacific'}]})
 
-        result = send_mass_email_from_template(self.user, user_list4, self.message_subject, self.message_template_2,memo, True)
+        result = send_mass_email_message_from_template(self.user, user_list4, self.message_subject, self.message_template_2, self.message_template_2_html, memo, True)
 
         self.assertEqual(result["text"]["mail_count"], 3001)
         self.assertEqual(result["code"], 201)
 
         #test send empty user list
-        result = send_mass_email_from_template(self.user, [], self.message_subject, self.message_template_2,memo, True)
+        result = send_mass_email_message_from_template(self.user, [], self.message_subject, self.message_template_2, self.message_template_2_html, memo, True)
         self.assertEqual(result["text"]["mail_count"], 0)
         self.assertEqual(result["code"], 400)
 
