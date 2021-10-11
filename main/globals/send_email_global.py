@@ -15,7 +15,7 @@ from django.conf import settings
 from django.core.mail import send_mass_mail
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
-from django.utils.html import strip_tags
+
 from django.core.mail import send_mail
 
 from main.models import Parameters, MassEmail
