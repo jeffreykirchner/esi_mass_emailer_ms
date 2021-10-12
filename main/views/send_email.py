@@ -12,6 +12,7 @@ import time
 from django.conf import settings
 
 from main.globals import send_mass_email_from_template
+from main.globals import send_mass_email_message_from_template
 
 class SendEmailView(APIView):
     '''
@@ -48,10 +49,11 @@ def take_and_send_incoming_email(user, data, use_test_subject):
         user_list.append(u)
 
         if email_counter == email_block:
-            result_list.append(send_mass_email_from_template(user,
+            result_list.append(send_mass_email_message_from_template(user,
                                                 user_list,
                                                 data["message_subject"],
                                                 data["message_text"],
+                                                data.get("message_text_html", None),
                                                 data["memo"],
                                                 use_test_subject))
 
@@ -63,10 +65,11 @@ def take_and_send_incoming_email(user, data, use_test_subject):
         time.sleep(sleep_length)
 
     if len(user_list) > 0:
-        result_list.append(send_mass_email_from_template(user,
+        result_list.append(send_mass_email_message_from_template(user,
                                                         user_list,
                                                         data["message_subject"],
                                                         data["message_text"],
+                                                        data.get("message_text_html", None),
                                                         data["memo"],
                                                         use_test_subject))
 

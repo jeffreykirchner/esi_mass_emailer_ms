@@ -1,5 +1,5 @@
 logs/*
-ESIPayPalMSEnv/*
+ESIMassEmailerEnv
 .vscode/*
 *.pyc
 local_settings.py
