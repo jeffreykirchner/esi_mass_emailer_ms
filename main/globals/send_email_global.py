@@ -1,5 +1,6 @@
 
 from smtplib import SMTPException
+from typing import Type
 from rest_framework import status
 
 from asgiref.sync import async_to_sync
@@ -174,10 +175,10 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
             new_message_body_html = message_html
 
             for variable in user["variables"]:
-                new_message_body_plain = new_message_body_plain.replace(f'[{variable["name"]}]', variable["text"])
+                new_message_body_plain = new_message_body_plain.replace(f'[{variable["name"]}]', str(variable["text"]))
 
                 if message_html:
-                    new_message_body_html = new_message_body_html.replace(f'[{variable["name"]}]', variable["text"])
+                    new_message_body_html = new_message_body_html.replace(f'[{variable["name"]}]', str(variable["text"]))
 
             #fill in subject parameters
             new_message = EmailMultiAlternatives()            
@@ -204,6 +205,10 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
     except KeyError as key_error:
         logger.warning(f"send_mass_email_from_template: {key_error} was not found in {user}")
         return {'text' : {"mail_count" : 0, "error_message" : f'{key_error} was not found in {user}'},
+                'code' : status.HTTP_400_BAD_REQUEST}
+    except TypeError as type_error:
+        logger.warning(f"send_mass_email_from_template: {type_error} was not found in {user}")
+        return {'text' : {"mail_count" : 0, "error_message" : f'Invalid email variables were not found in {user}'},
                 'code' : status.HTTP_400_BAD_REQUEST}
     
     #send emails
