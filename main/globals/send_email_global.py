@@ -127,8 +127,7 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
     send mass EmailMessage to user list filling in variables
         user_list : {email:email, variables:[{name:text},{name:text}] }
         subject : string subject line of email
-        message_plain : plain text string message template to be sent
-        message_html : html text string message template to be sent
+        message : string message template to be sent
         memo : string about message's purpose
         use_test_accout : send all email to test accout
     '''
@@ -187,7 +186,6 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
             new_message.subject = subject
             new_message.body = new_message_body_plain
             
-            #attach html version if provided
             if message_html:
                 new_message.attach_alternative(new_message_body_html, "text/html")
             
@@ -321,9 +319,8 @@ def send_email_messages(messages):
     send a list of email messages using send_messages
     messages : EmailMessage
     '''
-    with mail.get_connection(fail_silently=False) as connection:
-    #connection = mail.get_connection()
-        result = connection.send_messages(messages)
-        connection.close()
+    connection = mail.get_connection()
+    result = connection.send_messages(messages)
+    connection.close()
 
     return result
