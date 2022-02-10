@@ -1,17 +1,19 @@
 '''
 send email view
 '''
+from datetime import datetime
+
+import logging
+import time
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
 
-import logging
-import time
-
 from django.conf import settings
 
-from main.globals import send_mass_email_from_template
+#from main.globals import send_mass_email_from_template
 from main.globals import send_mass_email_message_from_template
 
 class SendEmailView(APIView):
@@ -36,19 +38,23 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     take incoming email and send it, send emails in groups of block size to limit overloading
     '''
 
-    email_block = 500
+    email_block = 250
     result_list = []
     email_counter = 0
     user_list = []
-    sleep_length = 65
+    sleep_length = 61
 
     for u in data["user_list"]:
 
         email_counter += 1
-
         user_list.append(u)
 
+        #if email counter hits block size, send emails then pause for cool down
         if email_counter == email_block:
+            
+            time_start = datetime.now()      
+        
+            
             result_list.append(send_mass_email_message_from_template(user,
                                                 user_list,
                                                 data["message_subject"],
@@ -57,13 +63,17 @@ def take_and_send_incoming_email(user, data, use_test_subject):
                                                 data["memo"],
                                                 use_test_subject))
 
+            time_end = datetime.now()
+            time_span = time_end-time_start
+
             email_counter = 0
             user_list = []
-            time.sleep(sleep_length)
+            time.sleep(sleep_length-time_span.total_seconds())
 
-    if len(data["user_list"]) >= email_block:
-        time.sleep(sleep_length)
+    # if len(data["user_list"]) >= email_block:
+    #     time.sleep(sleep_length)
 
+    #send remaining partial email block
     if len(user_list) > 0:
         result_list.append(send_mass_email_message_from_template(user,
                                                         user_list,
