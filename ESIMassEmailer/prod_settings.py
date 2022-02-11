@@ -77,6 +77,9 @@ LOGGING = {
     },
 }
 
+#simulate sending without sending live email
+SIMULATE_SEND = False
+
 #emails
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'   #log email to console
 EMAIL_HOST = 'exchange.chapman.edu'

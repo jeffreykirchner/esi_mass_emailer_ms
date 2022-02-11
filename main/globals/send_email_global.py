@@ -25,6 +25,7 @@ from django.utils.html import strip_tags
 
 from main.models import Parameters, MassEmail
 
+#depreciated
 def send_mass_email_from_template(user, user_list, subject, message, memo, use_test_account):
     '''
     send mass email to user list filling in variables
@@ -133,11 +134,11 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
     '''
 
     logger = logging.getLogger(__name__)
-    logger.info("Send mass EmailMessage to list")
+    logger.info(f"send_mass_email_message_from_template: Count:{len(user_list)}")
 
     #no emails to send
     if len(user_list) == 0:
-        logger.warning("User list empty")
+        logger.warning("send_mass_email_message_from_template: User list empty")
         return {'text' : {"mail_count" : 0, "error_message" : 'User list empty'},
                 'code' : status.HTTP_400_BAD_REQUEST}
 
@@ -156,7 +157,7 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
 
     mass_email.save()
 
-    logger.info(f'{settings.DEBUG} {test_account_email}')
+    logger.info(f'send_mass_email_message_from_template: Debug:{settings.DEBUG}, Test Account:{test_account_email}')
 
     message_block_count = 8            #number of message blocks to send
     message_block_counter = 0          #loop counter
@@ -214,19 +215,20 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
     mail_count = 0
     error_message = ""
 
-    logger.info(f'Start mail send {datetime.now()}')
+    logger.info(f'send_mass_email_message_from_template: Start mail send {datetime.now()}')
 
     try:
 
+   
         mail_count = send_email_blocks_pool(message_block_list)    
 
         # for message_block in message_block_list:            
         #     mail_count += send_email_block(message_block)
     except SMTPException as e:
-        logger.warning('There was an error sending email: ' + str(e)) 
+        logger.warning('send_mass_email_message_from_template: There was an error sending email: ' + str(e)) 
         error_message = str(e)
     
-    logger.info(f'End mail send {datetime.now()}, mail count {mail_count}, error message: {error_message}')
+    logger.info(f'send_mass_email_message_from_template: End mail send {datetime.now()}, mail count {mail_count}, error message: {error_message}')
 
     mass_email.email_result = {"mail_count" : mail_count, "error_message" : error_message}
     mass_email.save()
@@ -319,8 +321,13 @@ def send_email_messages(messages):
     send a list of email messages using send_messages
     messages : EmailMessage
     '''
-    connection = mail.get_connection()
-    result = connection.send_messages(messages)
-    connection.close()
+    with mail.get_connection(fail_silently=False) as connection:
+    #connection = mail.get_connection()
+        if settings.SIMULATE_SEND:
+            result = len(messages)
+        else:
+            result = connection.send_messages(messages)
+
+        connection.close()
 
     return result
