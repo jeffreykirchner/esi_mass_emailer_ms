@@ -215,7 +215,7 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
     mail_count = 0
     error_message = ""
 
-    logger.info(f'send_mass_email_message_from_template: Start mail send {datetime.now()}')
+    logger.info(f'send_mass_email_message_from_template: Start mail send {datetime.now()}, ID : {mass_email.id}')
 
     try:
 
@@ -228,7 +228,7 @@ def send_mass_email_message_from_template(user, user_list, subject, message_plai
         logger.warning('send_mass_email_message_from_template: There was an error sending email: ' + str(e)) 
         error_message = str(e)
     
-    logger.info(f'send_mass_email_message_from_template: End mail send {datetime.now()}, mail count {mail_count}, error message: {error_message}')
+    logger.info(f'send_mass_email_message_from_template: End mail send {datetime.now()}, mail count {mail_count}, error message: {error_message}, ID : {mass_email.id}')
 
     mass_email.email_result = {"mail_count" : mail_count, "error_message" : error_message}
     mass_email.save()
