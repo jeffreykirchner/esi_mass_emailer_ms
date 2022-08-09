@@ -34,17 +34,17 @@ personalization1.add_email(To('kirchner@chapman.edu'))
 personalization1.add_substitution(Substitution('[name]', 'Jeff'))
 message.add_personalization(personalization1)
 
-personalization1 = Personalization()
-personalization1.add_email(To('jkirchner@gmail.com'))
-personalization1.add_substitution(Substitution('[name]', 'Jeff K'))
-message.add_personalization(personalization1)
+# personalization1 = Personalization()
+# personalization1.add_email(To('jkirchner@gmail.com'))
+# personalization1.add_substitution(Substitution('[name]', 'Jeff K'))
+# message.add_personalization(personalization1)
 
 try:
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
     response = sg.send(message)
-    print(response.status_code)
-    print(response.body)
-    print(response.headers)
+    print(f'Status Code: {response.status_code}')
+    print(f'Body: {response.body}')
+    print(f'Headers: {response.headers}')
 except Exception as e:
     
-    print(e.message)
+    print(e)

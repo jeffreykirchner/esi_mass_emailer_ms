@@ -55,6 +55,9 @@ jobs:
         EMAIL_HOST_PASSWORD: abc
         EMAIL_TEST_ACCOUNT: abc
         SECRET_KEY: super_duper_secret_key
+        SENDGRID_API_KEY: abc
+        CSRF_TRUSTED_ORIGINS: abc
+        
       run: python manage.py test
     
     - name: Upload artifact for deployment jobs
