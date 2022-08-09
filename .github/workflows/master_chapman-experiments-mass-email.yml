@@ -59,6 +59,6 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: chapman-experiments-mass-email
-        slot-name: Production
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_601D252E979D4763805859BEF6348193 }}
+          slot-name: Production
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_601D252E979D4763805859BEF6348193 }}
 
