@@ -13,6 +13,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = 'main/static/'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split()
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split()
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -91,3 +92,6 @@ EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 600
 DEFAULT_FROM_EMAIL = os.environ['EMAIL_HOST_USER']
 EMAIL_TEST_ACCOUNT = os.environ['EMAIL_TEST_ACCOUNT']          #all outgoing email sent here when in debug mode
+
+#sendgrid
+SENDGRID_API_KEY=os.environ['SENDGRID_API_KEY']
