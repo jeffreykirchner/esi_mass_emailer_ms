@@ -12,7 +12,6 @@ import logging
 
 from django.conf import settings
 
-from main.globals import send_mass_email_from_template
 from main.globals import send_mass_email_message_from_template
 from main.globals import make_tz_aware_utc
 
