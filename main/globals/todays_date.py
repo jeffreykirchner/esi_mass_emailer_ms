@@ -6,7 +6,7 @@ from datetime import datetime,timedelta
 import logging
 import pytz
 
-from main.models import Parameters
+import main
 
 #get todays, time zone adjusted date time object
 def todaysDate():
@@ -16,7 +16,7 @@ def todaysDate():
     #logger = logging.getLogger(__name__)
     #logger.info("Get todays date object")
 
-    prm = Parameters.objects.first()
+    prm = main.models.Parameters.objects.first()
     tmz = pytz.timezone(prm.experimentTimeZone)
 
     d_today = datetime.now(tmz)
@@ -29,7 +29,7 @@ def todays_time():
     get current tz adjusted time
     '''
 
-    prm = Parameters.objects.first()
+    prm = main.models.Parameters.objects.first()
     tmz = pytz.timezone(prm.experimentTimeZone)
 
     d_today = datetime.now(tmz)

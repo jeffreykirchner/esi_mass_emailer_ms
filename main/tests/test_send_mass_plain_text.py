@@ -1,15 +1,12 @@
 '''
 test send mass plain text email
 '''
-from datetime import datetime, timedelta
 
-import json
 import logging
 
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from main.globals import send_mass_email_from_template
 from main.globals import send_mass_email_message_from_template
 
 from django.core import mail

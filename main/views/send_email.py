@@ -15,6 +15,10 @@ from django.conf import settings
 
 #from main.globals import send_mass_email_from_template
 from main.globals import send_mass_email_message_from_template
+from main.globals import send_mass_email_message_from_template_sendgrid
+from main.globals import MailSystem
+
+import main
 
 class SendEmailView(APIView):
     '''
@@ -27,7 +31,7 @@ class SendEmailView(APIView):
         handle incoming send mass email
         '''
         logger = logging.getLogger(__name__)
-        logger.info(request.data)
+        logger.info(f'SendEmailView: data: {request.data}')
 
         result = take_and_send_incoming_email(request.user, request.data, settings.DEBUG)
 
@@ -38,11 +42,21 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     take incoming email and send it, send emails in groups of block size to limit overloading
     '''
 
-    email_block = 250
+    p = main.models.Parameters.objects.first()
+
+    if p.mail_system == MailSystem.EXCHANGE:
+        email_block = 250
+        sleep_length = 61
+    elif p.mail_system == MailSystem.SEND_GRID:
+        email_block = 1000
+        sleep_length = 1
+    else:
+        return {'text' : {"mail_count" : 0, "error_message" : "Invalid mail system."},
+                'code' : status.HTTP_400_BAD_REQUEST}
+    
     result_list = []
     email_counter = 0
-    user_list = []
-    sleep_length = 61
+    user_list = []    
 
     for u in data["user_list"]:
 
@@ -54,14 +68,23 @@ def take_and_send_incoming_email(user, data, use_test_subject):
             
             time_start = datetime.now()      
         
-            
-            result_list.append(send_mass_email_message_from_template(user,
-                                                user_list,
-                                                data["message_subject"],
-                                                data["message_text"],
-                                                data.get("message_text_html", None),
-                                                data["memo"],
-                                                use_test_subject))
+            if p.mail_system == MailSystem.EXCHANGE:
+                result_list.append(send_mass_email_message_from_template(user,
+                                                    user_list,
+                                                    data["message_subject"],
+                                                    data["message_text"],
+                                                    data.get("message_text_html", None),
+                                                    data["memo"],
+                                                    use_test_subject))
+            elif p.mail_system == MailSystem.SEND_GRID:
+                result_list.append(send_mass_email_message_from_template_sendgrid(user,
+                                                    user_list,
+                                                    data["message_subject"],
+                                                    data["message_text"],
+                                                    data.get("message_text_html", None),
+                                                    data["memo"],
+                                                    use_test_subject))
+
 
             time_end = datetime.now()
             time_span = time_end-time_start
@@ -70,18 +93,24 @@ def take_and_send_incoming_email(user, data, use_test_subject):
             user_list = []
             time.sleep(sleep_length-time_span.total_seconds())
 
-    # if len(data["user_list"]) >= email_block:
-    #     time.sleep(sleep_length)
-
     #send remaining partial email block
     if len(user_list) > 0:
-        result_list.append(send_mass_email_message_from_template(user,
-                                                        user_list,
-                                                        data["message_subject"],
-                                                        data["message_text"],
-                                                        data.get("message_text_html", None),
-                                                        data["memo"],
-                                                        use_test_subject))
+        if p.mail_system == MailSystem.EXCHANGE:
+            result_list.append(send_mass_email_message_from_template(user,
+                                                            user_list,
+                                                            data["message_subject"],
+                                                            data["message_text"],
+                                                            data.get("message_text_html", None),
+                                                            data["memo"],
+                                                            use_test_subject))
+        elif p.mail_system == MailSystem.SEND_GRID:
+            result_list.append(send_mass_email_message_from_template_sendgrid(user,
+                                                    user_list,
+                                                    data["message_subject"],
+                                                    data["message_text"],
+                                                    data.get("message_text_html", None),
+                                                    data["memo"],
+                                                    use_test_subject))
 
     mail_count = 0
     mail_code = status.HTTP_201_CREATED
