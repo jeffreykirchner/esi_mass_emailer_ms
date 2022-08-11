@@ -31,7 +31,7 @@ class SendEmailView(APIView):
         handle incoming send mass email
         '''
         logger = logging.getLogger(__name__)
-        logger.info(request.data)
+        logger.info(f'SendEmailView: data: {request.data}')
 
         result = take_and_send_incoming_email(request.user, request.data, settings.DEBUG)
 
@@ -42,13 +42,13 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     take incoming email and send it, send emails in groups of block size to limit overloading
     '''
 
-    p = main.models.Parameters.first()
+    p = main.models.Parameters.objects.first()
 
     if p.mail_system == MailSystem.EXCHANGE:
         email_block = 250
         sleep_length = 61
     elif p.mail_system == MailSystem.SEND_GRID:
-        email_block = 2
+        email_block = 1000
         sleep_length = 1
     else:
         return {'text' : {"mail_count" : 0, "error_message" : "Invalid mail system."},
@@ -56,8 +56,7 @@ def take_and_send_incoming_email(user, data, use_test_subject):
     
     result_list = []
     email_counter = 0
-    user_list = []
-    
+    user_list = []    
 
     for u in data["user_list"]:
 

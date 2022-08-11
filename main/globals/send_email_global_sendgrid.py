@@ -80,7 +80,7 @@ def send_mass_email_message_from_template_sendgrid(user, user_list, subject, mes
             else:
                 personalization.add_email(To(u["email"]))
 
-            for v in user["variables"]:
+            for v in u["variables"]:
                 substitution = Substitution(f'[{v["name"]}]', str(v["text"]))
                 personalization.add_substitution(substitution)
                 
@@ -89,8 +89,6 @@ def send_mass_email_message_from_template_sendgrid(user, user_list, subject, mes
         
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         response = sg.send(message)
-
-            
 
         if response.status_code == 202:
             mail_count = len(user_list)
