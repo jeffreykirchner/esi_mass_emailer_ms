@@ -66,9 +66,13 @@ def send_mass_email_message_from_template_sendgrid(user, user_list, subject, mes
 
         message.content = [
             Content(
-                mime_type="text/html",
+                mime_type=MimeType.html,
                 content=message_html
-            )
+            ),
+            Content(
+                mime_type=MimeType.text,
+                content=message_plain
+            ),
         ]
 
         for u in user_list:
