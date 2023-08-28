@@ -76,6 +76,9 @@ def take_and_send_incoming_email(user, data, use_test_subject):
                                                     data.get("message_text_html", None),
                                                     data["memo"],
                                                     use_test_subject))
+                
+                time.sleep(max(sleep_length-time_span.total_seconds(), 1))
+
             elif p.mail_system == MailSystem.SEND_GRID:
                 result_list.append(send_mass_email_message_from_template_sendgrid(user,
                                                     user_list,
@@ -91,8 +94,7 @@ def take_and_send_incoming_email(user, data, use_test_subject):
 
             email_counter = 0
             user_list = []
-            time.sleep(sleep_length-time_span.total_seconds())
-
+            
     #send remaining partial email block
     if len(user_list) > 0:
         if p.mail_system == MailSystem.EXCHANGE:
