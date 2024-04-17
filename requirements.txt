@@ -1,7 +1,7 @@
 asgiref==3.6.*
 Django==4.2.*
 djangorestframework==3.14.0
-gunicorn==20.1.0
+gunicorn==22.0.0
 psycopg==3.1.9
 python-http-client==3.3.7
 pytz==2022.2.1
