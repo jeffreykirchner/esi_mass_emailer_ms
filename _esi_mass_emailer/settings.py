@@ -43,7 +43,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ESIMassEmailer.urls'
+ROOT_URLCONF = '_esi_mass_emailer.urls'
 
 TEMPLATES = [
     {
@@ -61,7 +61,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ESIMassEmailer.wsgi.application'
+WSGI_APPLICATION = '_esi_mass_emailer.wsgi.application'
 
 
 # Password validation
