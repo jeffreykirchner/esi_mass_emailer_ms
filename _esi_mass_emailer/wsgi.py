@@ -1,5 +1,5 @@
 """
-WSGI config for ESIMassEmailer project.
+WSGI config for _esi_mass_emailer project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ESIMassEmailer.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', '_esi_mass_emailer.settings')
 
 application = get_wsgi_application()

@@ -1,5 +1,5 @@
 logs/*
-ESIMassEmailerEnv
+_esi_mass_emailerEnv
 .vscode/*
 *.pyc
 local_settings.py
