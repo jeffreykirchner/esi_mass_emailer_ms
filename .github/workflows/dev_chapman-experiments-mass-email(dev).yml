@@ -85,6 +85,6 @@ jobs:
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'chapman-experiments-mass-email'
+          app-name: ${{ secrets.AZURE_APP_NAME }}
           slot-name: 'dev'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_24b28c33c75840679333cc711dc7c35e }}
