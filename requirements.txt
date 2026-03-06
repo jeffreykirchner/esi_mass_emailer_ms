@@ -6,5 +6,5 @@ psycopg==3.2.6
 pytz==2025.2
 requests==2.32.4
 sendgrid==6.12.4
-sqlparse==0.5.0
+sqlparse==0.5.5
 whitenoise==6.10.0
