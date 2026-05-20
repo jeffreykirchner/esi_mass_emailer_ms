@@ -147,8 +147,5 @@ if os.environ.get('GITHUB_WORKFLOW', False):
 
 
 OAUTH2_PROVIDER = {
-    # this is the list of available scopes
     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
 }
-
-CORS_ORIGIN_ALLOW_ALL = True
