@@ -1,5 +1,5 @@
 asgiref==3.8.1
-Django==5.2.15
+Django==5.2.16
 django-cors-headers==4.9.0
 djangorestframework==3.16.1
 django-oauth-toolkit==2.3.0
@@ -7,6 +7,6 @@ gunicorn==23.0.0
 psycopg==3.2.6
 pytz==2025.2
 requests==2.33.0
-sendgrid==6.12.4
-sqlparse==0.5.5
+sendgrid==6.12.5
+sqlparse==0.6.0
 whitenoise==6.10.0
